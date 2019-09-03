@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;namespace CommandPattern
+using System.Collections.Generic;
+namespace CommandPattern
 {
     public class InputHandler : MonoBehaviour
     {
