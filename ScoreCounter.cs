@@ -30,3 +30,18 @@ using UnityEngine;
          score = target;
      }
  }
+
+
+/*
+public int partialScore;
+private int scoreT = 0;
+void Start () {
+    partialScore = 3000; //example score
+}
+void Update () {        
+    if(int.Parse(GetComponent<UILabel>().text) < partialScore){
+        GetComponent<UILabel>().text = scoreT.ToString();
+        scoreT = scoreT + 10; //Example Step
+    }
+}
+*/
