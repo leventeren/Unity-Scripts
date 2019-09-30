@@ -28,3 +28,9 @@ public IEnumerator DoDeleteAll()
  var children = new List<GameObject>();
  foreach (Transform child in transform) children.Add(child.gameObject);
  children.ForEach(child => Destroy(child));
+
+###################### /* use this! */
+
+foreach (Transform child in TextHolder.transform) {
+     GameObject.Destroy(child.gameObject);
+ }
