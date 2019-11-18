@@ -55,3 +55,43 @@ void Awake()
             }
         }
 #endif
+
+
+
+
+
+And the vertex shader code.
+
+#define P_LENGTH 20
+uniform float4 _PlayerWorldPos[P_LENGTH];
+uniform float _DisplacementStrength;
+uniform float _Radius;
+uniform float _SquishThreshold;
+float getPlayerObjectDistance(int pIndex) {
+    float2 pPos = mul(unity_WorldToObject, _PlayerWorldPos[pIndex]).xz;
+    return length(pPos);
+}
+void vert(inout appdata_full v) {
+    // check if this object is within a certain distance of the player
+    float d = getPlayerObjectDistance(0);
+    if (d > (_Radius * P_LENGTH * .3)) {
+        // ignore this vertex if the player is too far away
+        return;
+    }
+    // check how many player positions are within range of this object
+    int numPFramesContained = 0;
+    if (d < _Radius) numPFramesContained++;
+    for (int i = 1; i < P_LENGTH; i++) {
+        if(getPlayerObjectDistance(i) < _Radius) numPFramesContained++;
+    }
+    float originalVertY = v.vertex.y;
+    // displace this vertex down a certain intensity based on how long the player has been near this object
+    float intensity = (numPFramesContained / (float)P_LENGTH);
+    // we transform intensity here with a cubic function for the fast-in, slow-out effect
+    intensity -= 1.;
+    intensity = 1. + (intensity*intensity*intensity);
+    v.vertex.y -= intensity * _DisplacementStrength * .5 * saturate(v.vertex.y);
+    if (originalVertY > v.vertex.y) {
+        v.vertex.y = max(_SquishThreshold, v.vertex.y);
+    }
+}
