@@ -1,0 +1,9 @@
+Target FPS : 30 / 60 (recommended)
+
+Game View
+FHD - 1080
+Custom
+4:5 (0,8)
+
+Game
+864x1080
