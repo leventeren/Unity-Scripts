@@ -22,3 +22,38 @@ private void Searcher(List<GameObject> list,GameObject root)
         }
     }
 }
+
+
+
+/* OTHER */
+USE : gameobjet.GetAllChilds()
+    
+List<Transform> GetAllChilds(Transform _t)
+ {
+     List<Transform> ts = new List<Transform>();
+
+     foreach (Transform t in _t)
+     {
+         ts.Add(t);
+         if (t.childCount > 0)
+             ts.AddRange(GetAllChilds(t));
+     }
+
+     return ts;
+ }
+
+
+/* EXTENSION */
+
+public static class TransformExtension {
+     public static List<Transform> GetAllChildren(this Transform parent, List<Transform> transformList = null)
+      {
+          if (transformList == null) transformList = new List<Transform>();
+          
+          foreach (Transform child in parent) {
+              transformList.Add(child);
+              child.GetAllChildren(transformList);
+          }
+          return transformList;
+      }
+ }
