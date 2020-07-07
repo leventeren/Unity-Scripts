@@ -1,0 +1,83 @@
+using UnityEngine;
+[System.Serializable]
+public class Avatar
+{
+  public string AvatarName;
+  public byte AvatarId;
+  public Sprite Icon;
+  public string Description;
+}
+    
+    
+    
+using System.Collections.Generic;
+using UnityEngine;
+[CreateAssetMenu(fileName = "Avatar Data", menuName = "Create Avatar Data", order = 51)]
+public class AvatarData : ScriptableObject
+{
+  public List<Avatar> avatars = new List<Avatar>();
+}
+
+
+
+using UnityEngine;
+public class AvatarSelection : MonoBehaviour
+{
+  [SerializeField]
+  private AvatarData avatarData;
+  private void Start()
+  {
+    for (int i = 0; i < avatarData.avatars.Count; i++)
+    {
+      Debug.Log("Avatar Name: " + avatarData.avatars[i].AvatarName);
+      Debug.Log("Avatar Id: " + avatarData.avatars[i].AvatarId);
+      Debug.Log("Avatar description: " + avatarData.avatars[i].Description);
+    }
+  }
+}
+
+
+
+using System.IO;
+using UnityEngine;
+public class AvatarSelection : MonoBehaviour
+{
+    private AvatarData avatarData;
+    private void Awake()
+    {
+        avatarData = LoadData();
+    }
+    private void Start()
+    {
+        for (int i = 0; i < avatarData.avatars.Count; i++)
+        {
+            Debug.Log("Avatar Name: " + avatarData.avatars[i].AvatarName);
+            Debug.Log("Avatar Id: " + avatarData.avatars[i].AvatarId);
+            Debug.Log("Avatar description: " + avatarData.avatars[i].Description);
+        }
+    }
+    private void OnDisable()
+    {
+        SaveData();
+    }
+    void SaveData()
+    {
+        string json = JsonUtility.ToJson(avatarData);
+        File.WriteAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "AvatarData.txt", json);
+    }
+    AvatarData LoadData()
+    {
+        AvatarData data = null;
+        if (File.Exists(Application.persistentDataPath + Path.DirectorySeparatorChar + "AvatarData.txt"))
+        {
+            data = ScriptableObject.CreateInstance<AvatarData>();
+            string json = File.ReadAllText(Application.persistentDataPath + Path.DirectorySeparatorChar + "AvatarData.txt");
+            JsonUtility.FromJsonOverwrite(json, data);
+        }
+        else
+        {
+            data = Resources.Load<AvatarData>("Avatar Data");
+        }
+        return data;
+    }
+}
