@@ -1,0 +1,3 @@
+Vector3 temp = transform.position;
+temp.y += bounceSpeed;
+transform.position = temp;
