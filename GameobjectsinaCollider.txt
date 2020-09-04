@@ -1,0 +1,5 @@
+Physics.OverlapBox It will Find all colliders touching or inside of the given box. so you can set the size of your box for your purpose
+
+Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, transform.localScale / 2, Quaternion.identity, m_LayerMask);
+
+Collider.gameObject
