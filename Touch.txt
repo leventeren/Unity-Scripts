@@ -1,0 +1,161 @@
+using System;
+using Pixelplacement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
+public class PlayerMove : MonoBehaviour
+{
+    private bool playerIsOnLeft = true;
+    public TrackMove track;
+    [SerializeField] private Rigidbody rb;
+    private Animator animator;
+    [SerializeField]
+    private Spline spline;
+
+    [SerializeField]
+    private float cooldown = 0.15f;
+    private float timer;
+    
+
+    [SerializeField] private TextController textController;
+    [SerializeField] private GameObject explosiveBody;
+    [SerializeField] private GameController gameController;
+
+    private float screenCenterX;
+
+
+    void Awake()
+    {
+        animator = GetComponent<Animator>();
+        screenCenterX = Screen.width * 0.5f;
+
+    }
+    
+    void Update()
+    {
+        if (!gameController.isAlive)
+            return;
+    #if UNITY_ANDROID
+        if (Input.touchCount < 1)
+            return;
+        
+        Touch firstTouch = Input.GetTouch(0);
+
+        if (firstTouch.phase != TouchPhase.Began)
+            return;
+        
+     if(firstTouch.position.x < screenCenterX && Time.time > timer)
+     {
+         if (!playerIsOnLeft)
+             MoveLeft();
+    
+         timer = Time.time + cooldown;
+         
+         gameController.AddScore();
+
+         if (!gameController.gameStarted)
+             gameController.gameStarted = true;
+
+            animator.SetTrigger("jump");
+            track.RightRotate();
+     }   
+     else if(firstTouch.position.x > screenCenterX && Time.time > timer)
+     {
+         if (playerIsOnLeft)
+             MoveRight();
+   
+         timer = Time.time + cooldown;
+         
+         gameController.AddScore();
+         
+         if (!gameController.gameStarted)
+             gameController.gameStarted = true;
+
+            animator.SetTrigger("jump");
+            track.RightRotate();
+     }
+     
+     #endif
+     
+        #if UNITY_STANDALONE_WIN
+        if(Input.GetButtonDown("Left") && Time.time > timer)
+        {
+            rb.isKinematic = true;
+            
+            if (!playerIsOnLeft)
+                MoveLeft();
+
+            
+            timer = Time.time + cooldown;
+         
+            gameController.AddScore();
+
+            if (!gameController.gameStarted)
+                gameController.gameStarted = true;
+            
+            animator.SetTrigger("jump");
+            
+            track.RightRotate();
+        }   
+        else if(Input.GetButtonDown("Right") && Time.time > timer)
+        {
+            rb.isKinematic = true;
+            
+            if (playerIsOnLeft)
+                MoveRight();
+
+            timer = Time.time + cooldown;
+         
+            gameController.AddScore();
+         
+            if (!gameController.gameStarted)
+                gameController.gameStarted = true;
+            
+            animator.SetTrigger("jump");
+            
+            track.RightRotate();
+        }
+
+        if(Time.time > timer &&  rb.isKinematic)
+            rb.isKinematic = false;
+        
+        #endif
+        
+        
+    }
+
+    private void MoveLeft()
+    {
+        playerIsOnLeft = true;
+        Tween.Spline (spline, transform, 0, 1, false, .2f, 0, Tween.EaseLinear, Tween.LoopType.None);
+    }
+    
+    private void MoveRight()
+    {
+        playerIsOnLeft = false;
+        Tween.Spline (spline, transform, 1, 0, false, .2f, 0, Tween.EaseLinear, Tween.LoopType.None);
+
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if(other.transform.CompareTag("Mark"))
+        {
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        gameController.isAlive = false;
+        explosiveBody.transform.position = transform.position +  new Vector3(0,1.25f,0);
+        explosiveBody.SetActive(true);
+
+        gameController.RestartLevel();
+        
+        gameObject.SetActive(false);
+
+    }
+    
+}
